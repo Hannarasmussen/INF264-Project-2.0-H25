@@ -1,2 +1,4 @@
 dataset.npz
 dataset_corrupted.npz
+.venv
+**/__pycache__
