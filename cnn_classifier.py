@@ -29,13 +29,15 @@ class GiftCNN(nn.Module):
 
 
 class CNN:
-    def __init__(self, num_epochs=20, batch_size=32, learning_rate=0.001, dropout_rate=0.25, weight_decay=1e-4, verbose=False):
+    def __init__(self, num_epochs=20, batch_size=32, learning_rate=0.001, dropout_rate=0.25, weight_decay=1e-4, verbose=False, random_state=42):
         self.num_epochs = num_epochs
         self.batch_size = batch_size
         self.learning_rate = learning_rate
         self.dropout_rate = dropout_rate
         self.weight_decay = weight_decay
         self.verbose = verbose
+        self.random_state = random_state
+        torch.manual_seed(self.random_state)
         
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = GiftCNN(dropout_rate=self.dropout_rate).to(self.device)
@@ -103,7 +105,8 @@ class CNN:
             "batch_size": self.batch_size,
             "learning_rate": self.learning_rate,
             "dropout_rate": self.dropout_rate,
-            "weight_decay": self.weight_decay
+            "weight_decay": self.weight_decay,
+            "random_state": self.random_state
         }
 
     def set_params(self, **params):
