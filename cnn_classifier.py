@@ -44,23 +44,22 @@ class CNN:
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
 
-    def compute_accuracy(self, loader):
+    def compute_accuracy(self, X, y):
         self.model.eval()
-        correct, total = 0, 0
-
+        X = torch.tensor(X, dtype=torch.float32).view(-1, 1, 20, 20)
+        y = torch.tensor(y, dtype=torch.long)
         with torch.no_grad():
-            for images, labels in loader:
-                images, labels = images.to(self.device), labels.to(self.device)
-                outputs = self.model(images)
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
+            X, y = X.to(self.device), y.to(self.device)
+            outputs = self.model(X)
+            _, predicted = torch.max(outputs.data, 1)
+        total = y.size(0)
+        correct = (predicted == y).sum().item()
 
         return correct / total
     
     def fit(self, X, y):
-
-        train_loader = DataLoader(TensorDataset(X, y), batch_size=self.batch_size, shuffle=True)
+        X = torch.tensor(X, dtype=torch.float32).view(-1, 1, 20, 20)
+        train_loader = DataLoader(TensorDataset(X, torch.tensor(y, dtype=torch.long)), batch_size=self.batch_size, shuffle=True)
 
         self.train_loss_history = []
 
@@ -87,6 +86,7 @@ class CNN:
 
     def predict(self, X):
         self.model.eval()
+        X = torch.tensor(X, dtype=torch.float32).view(-1, 1, 20, 20)
         dummy_labels = torch.zeros(X.size(0), dtype=torch.long)
         loader = DataLoader(TensorDataset(X, dummy_labels), batch_size=self.batch_size, shuffle=False)
         preds = []
